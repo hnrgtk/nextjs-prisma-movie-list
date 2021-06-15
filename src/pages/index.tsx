@@ -3,7 +3,6 @@ import Head from "next/head";
 import { List, PrismaClient } from "@prisma/client";
 import { GetServerSideProps } from "next";
 import { useForm } from "react-hook-form";
-import Input from "../components/Input";
 import Listbox from "../components/Listbox";
 import { useState } from "react";
 import { InputProps } from "../types";
@@ -14,14 +13,18 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const fetchedList: List[] = await prisma.list.findMany({
     include: {
       movies: {
+        select: {
+          listId: true,
+          id: true,
+          title: true,
+          watched: true,
+        },
         orderBy: {
           createdAt: "desc",
         },
       },
     },
   });
-  console.log(fetchedList[0].movies);
-
   return {
     props: {
       fetchedList,
@@ -32,15 +35,24 @@ export const getServerSideProps: GetServerSideProps = async () => {
 const App = ({ fetchedList }) => {
   const { handleSubmit, control } = useForm<InputProps>();
   const [list, setList] = useState(fetchedList);
+  const [showModal, setShowModal] = useState<any>([]);
 
-  const onSubmit = async (values: InputProps) => {
+  const onSubmit = async (values: InputProps, listId: string) => {
     try {
+      if (listId) {
+        values.listId = listId;
+      }
       const res = await fetch("/api/movies", {
         method: "POST",
         body: JSON.stringify(values),
       });
       if (res.ok) {
-        setList([...list, values]);
+        res.json().then((data) => {
+          let newList = [...data.movies];
+          setList(newList);
+          console.log(newList);
+          console.log(list);
+        });
       }
     } catch (err) {
       throw new Error(err);
@@ -49,7 +61,7 @@ const App = ({ fetchedList }) => {
   return (
     <div className="min-h-screen bg-gray-200">
       <Head>
-        <title>Create Next App</title>
+        <title>Lista de Filmes</title>
         <meta name="description" content="Generated" />
       </Head>
       <header className="flex flex-row justify-center w-full">
@@ -57,13 +69,20 @@ const App = ({ fetchedList }) => {
       </header>
       <main className="container mx-auto">
         <div className="grid grid-cols-4 gap-8">
-          {fetchedList.map((list) => (
-            <Listbox key={list.id} list={list} />
+          {fetchedList.map((list, idx) => (
+            <Listbox
+              key={list.id}
+              list={list}
+              listIndex={idx}
+              control={control}
+              showModal={showModal}
+              setShowModal={setShowModal}
+              onSubmit={handleSubmit((values: any) =>
+                onSubmit(values, list.id)
+              )}
+            />
           ))}
         </div>
-        {/* <Input name="title" control={control} />
-        <Input name="genre" control={control} />
-        <button onClick={handleSubmit(onSubmit)}>Submit</button> */}
       </main>
     </div>
   );

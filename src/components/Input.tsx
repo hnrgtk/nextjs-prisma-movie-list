@@ -3,18 +3,19 @@ import { useController, UseControllerProps } from "react-hook-form";
 import { InputProps } from "../types";
 
 const Input = (
-  props: UseControllerProps<InputProps> & InputHTMLAttributes<HTMLInputElement>
+  props: UseControllerProps<InputProps> &
+    InputHTMLAttributes<HTMLInputElement> & { label: string }
 ) => {
   const { field } = useController(props);
   return (
     <div>
-      <label>{props.name.charAt(0).toUpperCase() + props.name.slice(1)}</label>
+      <label>{props.label}</label>
       <div className="mb-3 pt-0">
         <input
           {...field}
           {...props}
           type="text"
-          className="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-60"
+          className="px-3 py-3 placeholder-blueGray-300 text-blueGray-600 relative bg-gray-200 rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-60"
         />
       </div>
     </div>

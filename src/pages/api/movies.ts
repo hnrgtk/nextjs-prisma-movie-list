@@ -7,9 +7,25 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Erro: Método não permitido!" });
   }
-  const createdMovie = await prisma.movie.create({
-    data: JSON.parse(req.body),
+
+  const parsedData = JSON.parse(req.body);
+
+  const addMovieOnList = await prisma.list.update({
+    where: {
+      id: JSON.parse(req.body).listId,
+    },
+    data: {
+      movies: {
+        create: {
+          title: parsedData.title,
+          genre: parsedData.genre,
+        },
+      },
+    },
+    select: {
+      movies: true,
+    },
   });
 
-  res.json(createdMovie);
+  res.json(addMovieOnList);
 };
