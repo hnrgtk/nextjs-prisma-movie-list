@@ -7,13 +7,23 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["orderByRelation", "orderByAggregateGroup"]
 }
 
 model Movie {
-  id      String  @id @default(cuid())
-  title   String
-  genre   String
-  rating  String  @default("")
-  watched Boolean @default(false)
+  id        String   @id @default(cuid())
+  title     String
+  genre     String
+  rating    String   @default("")
+  watched   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  List      List?    @relation(fields: [listId], references: [id])
+  listId    String?
+}
+
+model List {
+  id     String  @id @default(cuid())
+  name   String
+  movies Movie[]
 }
