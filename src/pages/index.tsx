@@ -1,16 +1,17 @@
 import Head from "next/head";
 
-import { List, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { GetServerSideProps } from "next";
 import { useForm } from "react-hook-form";
 import Listbox from "../components/Listbox";
 import { useState } from "react";
-import { InputProps } from "../types";
+import { InputProps, ListModel } from "../types";
+import { useRouter } from "next/dist/client/router";
 
 const prisma = new PrismaClient();
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const fetchedList: List[] = await prisma.list.findMany({
+  const fetchedList: ListModel[] = await prisma.list.findMany({
     include: {
       movies: {
         select: {
@@ -33,11 +34,19 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 const App = ({ fetchedList }) => {
+  const { asPath, replace } = useRouter();
   const { handleSubmit, control } = useForm<InputProps>();
-  const [list, setList] = useState(fetchedList);
   const [showModal, setShowModal] = useState<any>([]);
 
-  const onSubmit = async (values: InputProps, listId: string) => {
+  const refreshData = () => {
+    replace(asPath);
+  };
+
+  const onSubmit = async (
+    values: InputProps,
+    listId: string,
+    index: number
+  ) => {
     try {
       if (listId) {
         values.listId = listId;
@@ -46,16 +55,17 @@ const App = ({ fetchedList }) => {
         method: "POST",
         body: JSON.stringify(values),
       });
+
       if (res.ok) {
-        res.json().then((data) => {
-          let newList = [...data.movies];
-          setList(newList);
-          console.log(newList);
-          console.log(list);
-        });
+        refreshData();
       }
     } catch (err) {
       throw new Error(err);
+    } finally {
+      setShowModal((prevState) => {
+        prevState[index] = false;
+        return [...prevState];
+      });
     }
   };
   return (
@@ -69,19 +79,20 @@ const App = ({ fetchedList }) => {
       </header>
       <main className="container mx-auto">
         <div className="grid grid-cols-4 gap-8">
-          {fetchedList.map((list, idx) => (
-            <Listbox
-              key={list.id}
-              list={list}
-              listIndex={idx}
-              control={control}
-              showModal={showModal}
-              setShowModal={setShowModal}
-              onSubmit={handleSubmit((values: any) =>
-                onSubmit(values, list.id)
-              )}
-            />
-          ))}
+          {fetchedList &&
+            fetchedList.map((list, idx) => (
+              <Listbox
+                key={list.id}
+                list={list}
+                listIndex={idx}
+                control={control}
+                showModal={showModal}
+                setShowModal={setShowModal}
+                onSubmit={handleSubmit((values: any) =>
+                  onSubmit(values, list.id, idx)
+                )}
+              />
+            ))}
         </div>
       </main>
     </div>

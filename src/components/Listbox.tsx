@@ -1,14 +1,12 @@
-import { List } from "@prisma/client";
 import Card from "./Card";
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
 import Modal from "./Modal";
 import { Control } from "react-hook-form";
-import { InputProps } from "../types";
+import { InputProps, ListModel } from "../types";
 
 type ListboxProps = {
-  list: List;
+  list: ListModel;
   control: Control<InputProps>;
   onSubmit: (value: any) => void;
   showModal: any;
@@ -37,7 +35,7 @@ const Listbox = ({
         <p>{name}</p>
       </div>
       <div className="h-full">
-        {movies.length > 0 ? (
+        {movies && movies.length > 0 ? (
           movies.map((m) => (
             <div key={m.id} className="my-2">
               <Card movie={m} />

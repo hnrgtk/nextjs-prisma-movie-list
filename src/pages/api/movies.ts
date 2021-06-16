@@ -9,10 +9,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const parsedData = JSON.parse(req.body);
+  const listId = JSON.parse(req.body).listId;
 
   const addMovieOnList = await prisma.list.update({
     where: {
-      id: JSON.parse(req.body).listId,
+      id: listId,
     },
     data: {
       movies: {
