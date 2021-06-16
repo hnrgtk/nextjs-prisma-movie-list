@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
           watched: true,
         },
         orderBy: {
-          createdAt: "desc",
+          watched: "asc",
         },
       },
     },
@@ -38,10 +38,6 @@ const App = ({ fetchedList }) => {
   const { handleSubmit, control } = useForm<InputProps>();
   const [showModal, setShowModal] = useState<any>([]);
 
-  const refreshData = () => {
-    replace(asPath);
-  };
-
   const onSubmit = async (
     values: InputProps,
     listId: string,
@@ -57,7 +53,7 @@ const App = ({ fetchedList }) => {
       });
 
       if (res.ok) {
-        refreshData();
+        replace(asPath);
       }
     } catch (err) {
       throw new Error(err);

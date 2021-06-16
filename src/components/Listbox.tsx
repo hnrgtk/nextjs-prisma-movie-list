@@ -15,7 +15,7 @@ type ListboxProps = {
 };
 
 const Listbox = ({
-  list: { name, movies },
+  list: { name, movies, id },
   control,
   onSubmit,
   showModal,
@@ -38,7 +38,7 @@ const Listbox = ({
         {movies && movies.length > 0 ? (
           movies.map((m) => (
             <div key={m.id} className="my-2">
-              <Card movie={m} />
+              <Card movie={m} listId={id} />
             </div>
           ))
         ) : (
