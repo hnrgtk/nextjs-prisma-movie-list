@@ -1,3 +1,4 @@
+import { title } from "process";
 import React from "react";
 import { Control } from "react-hook-form";
 import Input from "../components/Input";
@@ -9,14 +10,22 @@ type Props = {
   control: Control<InputProps>;
   onSubmit: (value: any) => void;
   listIndex: number;
+  title: string;
+  body?: React.ReactNode;
+  buttonProps?: {
+    cancel?: string;
+    confirm?: string;
+  };
 };
 
 const Modal = ({
   showModal,
   setShowModal,
-  control,
   onSubmit,
   listIndex,
+  title,
+  body,
+  buttonProps,
 }: Props) =>
   showModal ? (
     <>
@@ -26,13 +35,10 @@ const Modal = ({
           <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
             {/*header*/}
             <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
-              <h3 className="text-3xl font-semibold">Adicionar filme</h3>
+              <h3 className="text-3xl font-semibold">{title}</h3>
             </div>
             {/*body*/}
-            <div className="relative p-6 flex-auto">
-              <Input name="title" label="Nome do filme" control={control} />
-              <Input name="genre" label="Gênero" control={control} />
-            </div>
+            {body}
             {/*footer*/}
             <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
               <button
@@ -45,14 +51,14 @@ const Modal = ({
                   });
                 }}
               >
-                Fechar
+                {buttonProps?.cancel || "Cancelar"}
               </button>
               <button
                 className="bg-green-600 text-white font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                 type="button"
                 onClick={onSubmit}
               >
-                Adicionar
+                {buttonProps?.confirm || "Confirmar"}
               </button>
             </div>
           </div>

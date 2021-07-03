@@ -33,11 +33,12 @@ const Card = ({ movie: { title, watched, id }, listId }: CardProps) => {
         watched ? "line-through" : "no-underline"
       }`}
     >
-      <p>{title}</p>
+      <p className="text-lg">{title}</p>
       {!watched && (
         <button
           onClick={handleWatched}
           className="text-2xl rounded shadow 
+          opacity-50
           hover:opacity-100 
           hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear 
           transition-all duration-150"
